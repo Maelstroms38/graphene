@@ -1,5 +1,10 @@
 from graphene_django import DjangoObjectType
 from catalog.models import Book, Author
+from django.contrib.auth import get_user_model
+
+class UserType(DjangoObjectType):
+    class Meta:
+        model = get_user_model()
 
 class BookType(DjangoObjectType):
 	class Meta:
@@ -11,7 +16,6 @@ class BookType(DjangoObjectType):
 			'author',
 			'summary',
 		)
-		use_connection = True
 
 class AuthorType(DjangoObjectType):
 	class Meta:
@@ -22,4 +26,3 @@ class AuthorType(DjangoObjectType):
 			'date_of_birth',
 			'date_of_death'
 		)
-		use_connection = True
