@@ -38,12 +38,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'graphene_django',
+    'corsheaders',
     'catalog',
-    'corsheaders'
+    'users',
+    'reviews',
 ]
 
 GRAPHENE = {
-    'SCHEMA': 'gql.schema.schema',
+    'SCHEMA': 'library.schema.schema',
     'MIDDLEWARE': [
         'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
