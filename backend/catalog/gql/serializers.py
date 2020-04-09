@@ -10,5 +10,6 @@ class BookSerializer(serializers.ModelSerializer):
             'summary',
             'isbn',
             'language',
-            'author'
+            'author',
+            'image'
         )

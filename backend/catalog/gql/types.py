@@ -6,7 +6,8 @@ class BookInputType(InputObjectType):
     title       = String()
     summary     = String()
     isbn        = String()
-    language    = String()
+    image       = String()
+    language    = ID()
     author      = ID() 
 
 class GenreType(DjangoObjectType):

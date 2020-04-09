@@ -34,7 +34,8 @@ class Book(models.Model):
     # Genre class has already been defined so we can specify the object above.
     genre = models.ManyToManyField(Genre, help_text='Select a genre for this book')
     language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
-    
+    image = models.CharField('Image URL', default='', max_length=1024, help_text='Book cover image link')
+
     def __str__(self):
         """String for representing the Model object."""
         return self.title
