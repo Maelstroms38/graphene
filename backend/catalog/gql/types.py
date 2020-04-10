@@ -1,4 +1,4 @@
-from graphene import InputObjectType, String, ID
+from graphene import InputObjectType, String, ID, List
 from graphene_django import DjangoObjectType
 from catalog.models import Book, Author, Genre, Language
 
@@ -7,8 +7,9 @@ class BookInputType(InputObjectType):
     summary     = String()
     isbn        = String()
     image       = String()
-    language    = ID()
-    author      = ID() 
+    language    = String()
+    author      = String() 
+    genres      = List(String)
 
 class GenreType(DjangoObjectType):
     class Meta:

@@ -1,23 +1,46 @@
 from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.db.models.signals import pre_save
+from django.utils.text import slugify
+from django.conf import settings
 from datetime import date
 import uuid
 
 class Genre(models.Model):
     """Model representing a book genre."""
     name = models.CharField(max_length=200, help_text='Enter a book genre (e.g. Science Fiction)')
-    
+    slug = models.SlugField(max_length=255, blank=True, unique=True)
+
     def __str__(self):
         """String for representing the Model object."""
         return self.name
 
+def genre_pre_save_receiver(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(instance.name)
+
+pre_save.connect(genre_pre_save_receiver, sender=Genre)
+
 class Language(models.Model):
     """Model representing a Language (e.g. English, French, Japanese, etc.)"""
     name = models.CharField(max_length=200, help_text="Enter the book's natural language (e.g. English, French, Japanese etc.)")
-
+    slug = models.SlugField(max_length=8, blank=True, unique=True)
+    
     def __str__(self):
     	return self.name
+
+def language_pre_save_reciever(sender, instance, *args, **kwargs):
+    if not instance.name and instance.slug:
+        lang_dict = dict(settings.LANGUAGES)
+        instance.name = lang_dict[instance.slug]
+
+    if not instance.slug and instance.name:
+        lang_dict = dict(settings.LANGUAGES)
+        invert_dict = dict((v, k) for k, v in lang_dict.items())
+        instance.slug = invert_dict[instance.name]
+
+pre_save.connect(language_pre_save_reciever, sender=Language)
 
 class Book(models.Model):
     """Model representing a book (but not a specific copy of a book)."""
@@ -27,6 +50,7 @@ class Book(models.Model):
     # Author as a string rather than object because it hasn't been declared yet in the file
     author = models.ForeignKey('Author', on_delete=models.SET_NULL, null=True)
     
+    slug = models.SlugField(max_length=255, blank=True, unique=True)
     summary = models.TextField(max_length=1000, help_text='Enter a brief description of the book')
     isbn = models.CharField('ISBN', max_length=13, help_text='13 Character <a href="https://www.isbn-international.org/content/what-isbn">ISBN number</a>')
     
@@ -42,13 +66,19 @@ class Book(models.Model):
     
     def get_absolute_url(self):
         """Returns the url to access a detail record for this book."""
-        return reverse('book-detail', args=[str(self.id)])
+        return reverse('book-detail', args=[str(self.slug)])
 
     def display_genre(self):
         """Create a string for the Genre. This is required to display genre in Admin."""
         return ', '.join(genre.name for genre in self.genre.all()[:3])
     
     display_genre.short_description = 'Genre'
+
+def book_pre_save_reciever(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify(instance.title)
+
+pre_save.connect(book_pre_save_reciever, sender=Book)
 
 class BookInstance(models.Model):
     """Model representing a specific copy of a book (i.e. that can be borrowed from the library)."""
@@ -93,13 +123,14 @@ class Author(models.Model):
     last_name = models.CharField(max_length=100)
     date_of_birth = models.DateField(null=True, blank=True)
     date_of_death = models.DateField('died', null=True, blank=True)
+    slug = models.SlugField(max_length=255, blank=True, unique=True)
 
     class Meta:
         ordering = ['last_name', 'first_name']
 
     def get_absolute_url(self):
         """Returns the url to access a particular author instance."""
-        return reverse('author-detail', args=[str(self.id)])
+        return reverse('author-detail', args=[str(self.slug)])
 
     def __str__(self):
         """String for representing the Model object."""
@@ -107,3 +138,9 @@ class Author(models.Model):
 
     class Meta:
         ordering = ['first_name']
+
+def author_pre_save_reciever(sender, instance, *args, **kwargs):
+    if not instance.slug:
+        instance.slug = slugify("%s-%s" %(instance.first_name, instance.last_name))
+
+pre_save.connect(author_pre_save_reciever, sender=Author)
