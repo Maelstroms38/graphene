@@ -60,6 +60,9 @@ class Book(models.Model):
     language = models.ForeignKey('Language', on_delete=models.SET_NULL, null=True)
     image = models.CharField('Image URL', default='', max_length=1024, help_text='Book cover image link')
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         """String for representing the Model object."""
         return self.title
@@ -135,9 +138,6 @@ class Author(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
-
-    class Meta:
-        ordering = ['first_name']
 
 def author_pre_save_reciever(sender, instance, *args, **kwargs):
     if not instance.slug:
