@@ -3,6 +3,7 @@ from catalog.models import Author, Book, BookInstance
 from .types import UserType
 from .mutations import UserCreate
 from django.contrib.auth import get_user_model
+from graphql_jwt.decorators import login_required
 import graphql_jwt
 
 User = get_user_model()
@@ -13,11 +14,9 @@ class Query(ObjectType):
     def resolve_users(root, info):
         return User.objects.all()
 
+    @login_required
     def resolve_current_user(root, info):
         user = info.context.user
-        if user.is_anonymous:
-            raise Exception('Not logged in!')
-
         return user
 
 class Mutation(ObjectType):
