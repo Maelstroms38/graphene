@@ -17,7 +17,7 @@
         <ul class="nav flex-column">
           <a href="{% url 'index' %}"><li class="btn btn-primary nav-link text-center">Home</li></a>
           {% if perms.catalog.can_mark_returned %}
-            <a href="{% url 'borrowed' %}"><li class="btn btn-primary nav-link text-center">Borrowed Books</li></a>
+            <a href="{% url 'borrowed' %}"><li class="btn btn-primary nav-link text-center">Bookshelf</li></a>
             <a href="{% url 'book_create' %}"><li class="btn btn-primary nav-link text-center">Add Book</li></a>
             <a href="{% url 'author_create' %}"><li class="btn btn-primary nav-link text-center">Add Author</li></a>
           {% endif %} 
