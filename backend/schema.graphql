@@ -31,6 +31,23 @@ input BookInputType {
   genres: [String]
 }
 
+enum BookInstanceStatus {
+  M
+  O
+  A
+  R
+}
+
+type BookInstanceType {
+  id: UUID!
+  book: BookType
+  imprint: String!
+  dueBack: Date
+  borrower: UserType
+  owner: UserType
+  status: BookInstanceStatus
+}
+
 type BookType {
   id: ID!
   title: String!
@@ -41,6 +58,7 @@ type BookType {
   genre: [GenreType!]!
   language: LanguageType
   image: String!
+  bookinstanceSet: [BookInstanceType!]!
   reviewSet: [ReviewType!]!
 }
 
@@ -127,6 +145,8 @@ enum ReviewValue {
   A_1
 }
 
+scalar UUID
+
 type UserCreate {
   user: UserType
 }
@@ -142,6 +162,8 @@ type UserType {
   isStaff: Boolean!
   isActive: Boolean!
   dateJoined: DateTime!
+  borrower: [BookInstanceType!]!
+  owner: [BookInstanceType!]!
   reviewSet: [ReviewType!]!
 }
 

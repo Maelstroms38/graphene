@@ -1,7 +1,7 @@
 from graphene import Argument, Field, List, ID, String, Int, ObjectType, Schema
 from catalog.models import Author, Book, BookInstance
-from .types import BookType, AuthorType
-from .mutations import BookCreate, BookDelete
+from .types import BookType, AuthorType, BookInstanceType
+from .mutations import BookCreate, BookUpdate, BookDelete, BookInstanceCreate, BookInstanceUpdate, BookInstanceDelete
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 
@@ -35,6 +35,10 @@ class Query(ObjectType):
 
 class Mutation(ObjectType):
     create_book = BookCreate.Field()
+    update_book = BookUpdate.Field()
     delete_book = BookDelete.Field()
+    create_book_instance = BookInstanceCreate.Field()
+    update_book_instance = BookInstanceUpdate.Field()
+    delete_book_instance = BookInstanceDelete.Field()
 
 schema = Schema(query=Query, mutation=Mutation)

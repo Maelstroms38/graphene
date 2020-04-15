@@ -1,13 +1,14 @@
 from graphene import Boolean, Field, ID, Mutation
-from catalog.models import Book, Author, Language, Genre
-from .serializers import BookSerializer
-from .types import BookType, BookInputType
+from catalog.models import Book, Author, Language, Genre, BookInstance
+from .serializers import BookSerializer, BookInstanceSerializer
+from .types import BookType, BookInputType, BookInstanceType, BookInstanceInputType
 from django.utils.text import slugify
+from graphql_jwt.decorators import login_required, permission_required
 
 class BookCreate(Mutation):
+    book = Field(BookType)
     class Arguments:
         input = BookInputType(required=True)
-    book = Field(BookType)
 
     @classmethod
     def mutate(cls, root, info, **data):
@@ -56,13 +57,72 @@ class BookCreate(Mutation):
         
         return BookCreate(book=obj)
 
-class BookDelete(Mutation):
+class BookUpdate(Mutation):
+    book = Field(BookType)
     class Arguments:
-        id = ID(required=True)
-    ok = Boolean()
+        input = BookInputType(required=True)
 
     @classmethod
+    @permission_required('catalog.can_mark_returned')
+    def mutate(cls, root, info, **data):
+        input_data = data.get('input')
+        book = Book.objects.get(id=input_data.get('id'))
+        serializer = BookSerializer(book, data=input_data)
+        serializer.is_valid(raise_exception=True)
+        return BookUpdate(book=serializer.save())
+
+class BookDelete(Mutation):
+    ok = Boolean()
+    class Arguments:
+        id = ID(required=True)
+
+    @classmethod
+    @permission_required('catalog.can_mark_returned')
     def mutate(cls, root, info, **data):
         book = Book.objects.get(id=data.get('id'))
         book.delete()
         return BookDelete(ok=True)
+
+class BookInstanceCreate(Mutation):
+    instance = Field(BookInstanceType)
+    class Arguments:
+        input = BookInstanceInputType(required=True)
+
+    @classmethod
+    @login_required
+    def mutate(cls, root, info, **data):
+        user = info.context.user
+        book_data = data.get('input')
+        book_data['owner'] = user.id 
+
+        serializer = BookInstanceSerializer(data=book_data)
+        serializer.is_valid(raise_exception=True)
+        return BookInstanceCreate(instance=serializer.save())
+
+class BookInstanceUpdate(Mutation):
+    instance = Field(BookInstanceType)
+    class Arguments:
+        input = BookInstanceInputType(required=True)
+
+    @classmethod
+    @login_required
+    def mutate(cls, root, info, **data):
+        user = info.context.user
+        input_data = data.get('input')
+        book = BookInstance.objects.get(id=input_data.get('id'), owner=user)
+        serializer = BookInstanceSerializer(book, data=input_data)
+        serializer.is_valid(raise_exception=True)
+        return BookInstanceUpdate(instance=serializer.save())
+
+class BookInstanceDelete(Mutation):
+    ok = Boolean()
+    class Arguments:
+        id = ID(required=True)
+
+    @classmethod
+    @login_required
+    def mutate(cls, root, info, **data):
+        user = info.context.user
+        book = BookInstance.objects.get(id=data.get('id'), owner=user)
+        book.delete()
+        return BookInstanceDelete(ok=True)

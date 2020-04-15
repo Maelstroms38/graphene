@@ -5,9 +5,11 @@ from reviews.models import Review
 class ReviewType(DjangoObjectType):
 	class Meta:
 		model = Review
+		convert_choices_to_enum = False
 
 class ReviewInputType(InputObjectType):
-    user        = ID()
-    comment     = String()
-    value       = Int()
-    book        = ID()
+	id          = ID()
+	user        = ID()
+	comment     = String()
+	value       = String()
+	book        = ID()
