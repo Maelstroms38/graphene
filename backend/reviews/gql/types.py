@@ -10,6 +10,6 @@ class ReviewType(DjangoObjectType):
 class ReviewInputType(InputObjectType):
 	id          = ID()
 	user        = ID()
-	comment     = String()
-	value       = String()
 	book        = ID()
+	comment     = String()
+	value       = Int()
