@@ -1,0 +1,8 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="container skull">
+  <p>Logged out!</p>  
+  <a href="{% url 'login'%}" class="btn btn-primary">Log back in</a>
+</div>
+{% endblock %}

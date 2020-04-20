@@ -1,0 +1,172 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type AuthorType {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  dateOfBirth: Date
+  dateOfDeath: Date
+  slug: String!
+  bookSet: [BookType!]!
+}
+
+type BookCreate {
+  book: BookType
+}
+
+type BookDelete {
+  ok: Boolean
+}
+
+input BookInputType {
+  title: String
+  summary: String
+  isbn: String
+  image: String
+  language: String
+  author: String
+  genres: [String]
+}
+
+enum BookInstanceStatus {
+  M
+  O
+  A
+  R
+}
+
+type BookInstanceType {
+  id: UUID!
+  book: BookType
+  imprint: String!
+  dueBack: Date
+  borrower: UserType
+  owner: UserType
+  status: BookInstanceStatus
+}
+
+type BookType {
+  id: ID!
+  title: String!
+  author: AuthorType
+  slug: String!
+  summary: String!
+  isbn: String!
+  genre: [GenreType!]!
+  language: LanguageType
+  image: String!
+  bookinstanceSet: [BookInstanceType!]!
+  reviewSet: [ReviewType!]!
+}
+
+scalar Date
+
+scalar DateTime
+
+scalar GenericScalar
+
+type GenreType {
+  id: ID!
+  name: String!
+  slug: String!
+  bookSet: [BookType!]!
+}
+
+type LanguageType {
+  id: ID!
+  name: String!
+  slug: String!
+  bookSet: [BookType!]!
+}
+
+type Mutation {
+  userCreate(email: String!, password: String!, username: String!): UserCreate
+  tokenAuth(username: String!, password: String!): ObtainJSONWebToken
+  verifyToken(token: String): Verify
+  refreshToken(token: String): Refresh
+  createReview(input: ReviewInputType!): ReviewCreate
+  deleteReview(id: ID!): ReviewDelete
+  createBook(input: BookInputType!): BookCreate
+  deleteBook(id: ID!): BookDelete
+}
+
+type ObtainJSONWebToken {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
+
+type Query {
+  currentUser: UserType
+  books(search: String, limit: Int, offset: Int): [BookType]
+  book(id: ID!): BookType
+  authors: [AuthorType]
+  author(id: ID!): AuthorType
+}
+
+type Refresh {
+  payload: GenericScalar!
+  refreshExpiresIn: Int!
+  token: String!
+}
+
+type ReviewCreate {
+  review: ReviewType
+}
+
+type ReviewDelete {
+  ok: Boolean
+}
+
+input ReviewInputType {
+  user: ID
+  comment: String
+  value: Int
+  book: ID
+}
+
+type ReviewType {
+  id: ID!
+  book: BookType!
+  user: UserType!
+  pubDate: DateTime!
+  comment: String!
+  value: ReviewValue!
+}
+
+enum ReviewValue {
+  A_5
+  A_4
+  A_3
+  A_2
+  A_1
+}
+
+scalar UUID
+
+type UserCreate {
+  user: UserType
+}
+
+type UserType {
+  id: ID!
+  lastLogin: DateTime
+  isSuperuser: Boolean!
+  username: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+  isStaff: Boolean!
+  isActive: Boolean!
+  dateJoined: DateTime!
+  borrower: [BookInstanceType!]!
+  owner: [BookInstanceType!]!
+  reviewSet: [ReviewType!]!
+}
+
+type Verify {
+  payload: GenericScalar!
+}
