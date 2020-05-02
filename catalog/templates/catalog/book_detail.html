@@ -5,8 +5,10 @@
   <h2>{{ book.title }}</h2>
   <img src="{{ book.image }}" class="skull img-thumbnail" style="width:250px;height:'100%';">
   <br>
-  <p><strong>Author:</strong> <a href="{% url 'author-detail' book.author.slug %}">{{ book.author }}</a></p> <!-- author detail link not yet defined -->
-  <p><strong>Summary:</strong> {{ book.summary }}</p>
+  <p><strong>Author:</strong> <a href="{% url 'author-detail' book.author.slug %}">{{ book.author }}</a></p> 
+  {% autoescape off %}
+    {{ pos }}
+  {% endautoescape %}
   <p><strong>ISBN:</strong> {{ book.isbn }}</p> 
   <p><strong>Language:</strong> {{ book.language }}</p>  
   <p><strong>Genres:</strong> {% for genre in book.genre.all %} {{ genre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>

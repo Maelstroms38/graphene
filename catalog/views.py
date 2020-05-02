@@ -12,6 +12,15 @@ from catalog.models import Book, Author, BookInstance, Genre
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from catalog.models import Author
+import spacy
+from spacy import displacy
+
+nlp = spacy.load("en_core_web_sm")
+
+def display_service(text):
+    doc = nlp(text)
+    html = displacy.render(doc, style="ent", page=False)
+    return html;
 
 def index(request):
     """View function for home page of site."""
@@ -39,8 +48,12 @@ class BookListView(generic.ListView):
     model = Book
     paginate_by = 10
 
-class BookDetailView(generic.DetailView):
-    model = Book
+def book_detail(request, slug):
+    book = get_object_or_404(Book, slug=slug)
+    pos = display_service(book.summary)
+    # print(pos)
+
+    return render(request, "catalog/book_detail.html", { "book": book, "pos": pos })
 
 class AuthorListView(generic.ListView):
     model = Author

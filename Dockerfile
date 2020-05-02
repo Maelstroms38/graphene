@@ -25,6 +25,7 @@ COPY . .
 
 # collect static files
 RUN python manage.py collectstatic --noinput
+RUN python -m spacy download en_core_web_sm
 
 # add and run as non-root user
 RUN adduser -D myuser
