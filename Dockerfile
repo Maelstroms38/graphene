@@ -12,20 +12,23 @@ ENV DEBUG 0
 #  install psycopg2
 RUN apk update \
     && apk add --virtual build-deps gcc python3-dev musl-dev \
+    && pip3 install pip -U \
+	&& pip3 install setuptools -U \
     && apk add postgresql-dev \
-    && pip install psycopg2 \
+    && pip3 install psycopg2 \
+	&& pip3 install -U spacy \
     && apk del build-deps
 
 # install dependencies
 COPY ./requirements.txt .
-RUN pip install -r requirements.txt
+RUN pip3 install -U -r requirements.txt
 
 # copy project
 COPY . .
 
 # collect static files
-RUN python manage.py collectstatic --noinput
-RUN python -m spacy download en_core_web_sm
+RUN python3 manage.py collectstatic --noinput
+RUN python3 -m spacy download en_core_web_sm
 
 # add and run as non-root user
 RUN adduser -D myuser
