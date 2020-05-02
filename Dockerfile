@@ -1,5 +1,4 @@
-# pull official base image
-FROM python:3.7-alpine
+FROM amd64/python:3.7-alpine
 
 # set work directory
 WORKDIR /app
@@ -11,17 +10,19 @@ ENV DEBUG 0
 
 #  install psycopg2
 RUN apk update \
+	&& apk add --update alpine-sdk \
+	&& apk --no-cache --update add build-base \
     && apk add --virtual build-deps gcc python3-dev musl-dev \
     && pip3 install pip -U \
 	&& pip3 install setuptools -U \
     && apk add postgresql-dev \
     && pip3 install psycopg2 \
-	&& pip3 install -U spacy \
     && apk del build-deps
+
 
 # install dependencies
 COPY ./requirements.txt .
-RUN pip3 install -U -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # copy project
 COPY . .
