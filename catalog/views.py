@@ -51,7 +51,6 @@ class BookListView(generic.ListView):
 def book_detail(request, slug):
     book = get_object_or_404(Book, slug=slug)
     pos = display_service(book.summary)
-    # print(pos)
 
     return render(request, "catalog/book_detail.html", { "book": book, "pos": pos })
 
