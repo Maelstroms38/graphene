@@ -23,13 +23,10 @@ RUN apk update \
 # install dependencies
 COPY ./requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
+RUN python3 -m spacy download en_core_web_sm
 
 # copy project
 COPY . .
-
-# collect static files
-RUN python3 manage.py collectstatic --noinput
-RUN python3 -m spacy download en_core_web_sm
 
 # add and run as non-root user
 RUN adduser -D myuser
