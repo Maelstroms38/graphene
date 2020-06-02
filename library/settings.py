@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'catalog',
     'users',
     'reviews',
+    'profiles',
+    'prompts',
 ]
 
 GRAPHENE = {
