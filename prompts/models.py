@@ -74,12 +74,13 @@ class Template(models.Model):
 	def __str__(self):
 		return self.heading
 
-def template_save_receiver(sender, instance, created, *args, **kwargs):
-	hash_regex = r'#(?P<hashtag>[\w\d-]+)'
-	hm = re.findall(hash_regex, instance.content)
-	parsed_hashtags.send(sender=instance.__class__, tag_list=hm)
+# NLP (Spacy) should handle sending parses parts of speech.
+# def template_save_receiver(sender, instance, created, *args, **kwargs):
+# 	hash_regex = r'#(?P<hashtag>[\w\d-]+)'
+# 	hm = re.findall(hash_regex, instance.content)
+# 	parsed_hashtags.send(sender=instance.__class__, tag_list=hm)
 
-post_save.connect(template_save_receiver, sender=Template)
+# post_save.connect(template_save_receiver, sender=Template)
 
 class PromptLike(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -135,12 +136,14 @@ def prompt_save_receiver(sender, instance, *args, **kwargs):
 		hash_regex = r'#(?P<hashtag>[\w\d-]+)'
 		tags = re.findall(hash_regex, instance.template.content)
 		content = instance.template.content
+		cached_tags = []
 		for tag in tags: 
-			choices = instance.template.tags.filter(token__iexact=tag)
+			choices = instance.template.tags.filter(token__iexact=tag).exclude(token__in=cached_tags)
 			if choices:
 				choice = random.choice(choices)
 				content = content.replace(f'#{tag}', 
 					choice.tag.replace('#', ''), 1)
+				cached_tags.append(choice.tag)
 		instance.content = content
 
 pre_save.connect(prompt_save_receiver, sender=Prompt)
