@@ -23,8 +23,8 @@ RUN apk update \
 
 # install dependencies
 COPY ./Pipfile .
-RUN pipenv install --skip-lock --system --dev
-RUN pipenv run python3 -m spacy download en_core_web_sm
+RUN pipenv install --skip-lock --system
+CMD ["pipenv", "run", "python3", "-m", "spacy", "download", "en_core_web_sm"]
 
 # copy project
 COPY . .
